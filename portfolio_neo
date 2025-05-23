@@ -1,0 +1,397 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyPortfolioApp());
+}
+
+class MyPortfolioApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'My Portfolio',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        scaffoldBackgroundColor: Colors.grey[100],
+      ),
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  final List<Map<String, Object>> pages = [
+    {'title': 'Profile', 'icon': Icons.person, 'widget': ProfilePage()},
+    {'title': 'Bio', 'icon': Icons.description, 'widget': BioPage()},
+    {'title': 'Contact Info', 'icon': Icons.contact_mail, 'widget': ContactPage()},
+    {'title': 'Skills', 'icon': Icons.code, 'widget': SkillsPage()},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: Text('My Portfolio'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.deepPurple, Colors.purpleAccent]),
+              ),
+              child: Center(
+                child: Text('Menu', style: TextStyle(fontSize: 24, color: Colors.white)),
+              ),
+            ),
+            ...pages.map((p) {
+              return ListTile(
+                leading: Icon(p['icon'] as IconData),
+                title: Text(p['title'] as String),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => p['widget'] as Widget));
+                },
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepPurple.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Column(
+          children: [
+            SizedBox(height: 100),
+            Text('Welcome!', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Text('Explore my portfolio', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 40),
+            Expanded(
+              child: GridView.count(
+                padding: EdgeInsets.all(20),
+                crossAxisCount: 2,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+                children: pages.map((p) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => p['widget'] as Widget));
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(p['icon'] as IconData, size: 48, color: Colors.deepPurple),
+                          SizedBox(height: 12),
+                          Text(p['title'] as String, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProfilePage extends StatefulWidget {
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String name = 'Your Name';
+
+  void _editName() async {
+    final controller = TextEditingController(text: name);
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Edit Name'),
+        content: TextField(controller: controller),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, controller.text), child: Text('Save')),
+        ],
+      ),
+    );
+    if (newName != null && newName.isNotEmpty) {
+      setState(() {
+        name = newName;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Profile')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(radius: 50, child: Icon(Icons.person, size: 50)),
+            SizedBox(height: 20),
+            Text(name, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            ElevatedButton.icon(
+              onPressed: _editName,
+              icon: Icon(Icons.edit),
+              label: Text('Edit Name'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class BioPage extends StatefulWidget {
+  @override
+  State<BioPage> createState() => _BioPageState();
+}
+
+class _BioPageState extends State<BioPage> {
+  String bio = 'I am a Flutter developer with a passion for clean UI and performance.';
+
+  void _editBio() async {
+    final controller = TextEditingController(text: bio);
+    final newBio = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Edit Bio'),
+        content: TextField(
+          controller: controller,
+          maxLines: 5,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, controller.text), child: Text('Save')),
+        ],
+      ),
+    );
+    if (newBio != null && newBio.isNotEmpty) {
+      setState(() {
+        bio = newBio;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Bio')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(bio, style: TextStyle(fontSize: 18)),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _editBio,
+              icon: Icon(Icons.edit),
+              label: Text('Edit Bio'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ContactPage extends StatefulWidget {
+  @override
+  State<ContactPage> createState() => _ContactPageState();
+}
+
+class _ContactPageState extends State<ContactPage> {
+  List<Map<String, String>> contacts = [
+    {'label': 'Email', 'value': 'you@example.com'},
+    {'label': 'Phone', 'value': '+123456789'},
+  ];
+
+  void _editContact(int index) async {
+    final result = await _showInputDialog('Edit ${contacts[index]['label']}', contacts[index]['value']!);
+    if (result != null) {
+      setState(() {
+        contacts[index]['value'] = result;
+      });
+    }
+  }
+
+  void _deleteContact(int index) {
+    setState(() {
+      contacts.removeAt(index);
+    });
+  }
+
+  void _addContact() async {
+    final label = await _showInputDialog('New Label', '');
+    if (label != null && label.isNotEmpty) {
+      final value = await _showInputDialog('Enter value for $label', '');
+      if (value != null) {
+        setState(() {
+          contacts.add({'label': label, 'value': value});
+        });
+      }
+    }
+  }
+
+  Future<String?> _showInputDialog(String title, String initialValue) {
+    final controller = TextEditingController(text: initialValue);
+    return showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: TextField(controller: controller),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, controller.text), child: Text('Save')),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Contact Info')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            ElevatedButton.icon(
+              onPressed: _addContact,
+              icon: Icon(Icons.add),
+              label: Text('Add Contact'),
+            ),
+            SizedBox(height: 10),
+            ...contacts.asMap().entries.map((entry) {
+              int i = entry.key;
+              var item = entry.value;
+              return Card(
+                child: ListTile(
+                  title: Text('${item['label']}: ${item['value']}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: Icon(Icons.edit), onPressed: () => _editContact(i)),
+                      IconButton(icon: Icon(Icons.delete), onPressed: () => _deleteContact(i)),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SkillsPage extends StatefulWidget {
+  @override
+  State<SkillsPage> createState() => _SkillsPageState();
+}
+
+class _SkillsPageState extends State<SkillsPage> {
+  List<String> skills = ['Flutter', 'Dart'];
+
+  void _editSkill(int index) async {
+    final result = await _showInputDialog('Edit Skill', skills[index]);
+    if (result != null) {
+      setState(() {
+        skills[index] = result;
+      });
+    }
+  }
+
+  void _deleteSkill(int index) {
+    setState(() {
+      skills.removeAt(index);
+    });
+  }
+
+  void _addSkill() async {
+    final newSkill = await _showInputDialog('New Skill', '');
+    if (newSkill != null && newSkill.isNotEmpty) {
+      setState(() {
+        skills.add(newSkill);
+      });
+    }
+  }
+
+  Future<String?> _showInputDialog(String title, String initialValue) {
+    final controller = TextEditingController(text: initialValue);
+    return showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: TextField(controller: controller),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, controller.text), child: Text('Save')),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Skills')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: ListView(
+          children: [
+            ElevatedButton.icon(
+              onPressed: _addSkill,
+              icon: Icon(Icons.add),
+              label: Text('Add Skill'),
+            ),
+            SizedBox(height: 10),
+            ...skills.asMap().entries.map((entry) {
+              int i = entry.key;
+              String skill = entry.value;
+              return Card(
+                child: ListTile(
+                  title: Text(skill),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: Icon(Icons.edit), onPressed: () => _editSkill(i)),
+                      IconButton(icon: Icon(Icons.delete), onPressed: () => _deleteSkill(i)),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
